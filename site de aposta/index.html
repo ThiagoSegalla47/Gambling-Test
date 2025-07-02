@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fortune Segalla</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>🎰 Fortune Segalla</h1>
+    <div class="slot-grid">
+      <div class="slot-cell"></div><div class="slot-cell"></div><div class="slot-cell"></div>
+      <div class="slot-cell"></div><div class="slot-cell"></div><div class="slot-cell"></div>
+      <div class="slot-cell"></div><div class="slot-cell"></div><div class="slot-cell"></div>
+    </div>
+    <div class="painel">
+      <label>Saldo: R$ <span id="saldo">100.00</span></label><br>
+      <label>Aposta:
+        <select id="aposta">
+          <option>0.4</option><option>0.8</option><option>1.2</option><option>1.6</option><option>2.0</option>
+          <option>2.4</option><option>2.8</option><option>3.2</option><option>3.6</option><option>4.0</option>
+          <option>8.0</option><option>12.0</option><option>15.0</option><option>16.0</option><option>20.0</option>
+          <option>24.0</option><option>28.0</option><option>30.0</option><option>32.0</option><option>36.0</option>
+          <option>40.0</option><option>45.0</option><option>50.0</option><option>75.0</option><option>100.0</option>
+          <option>120.0</option><option>150.0</option><option>250.0</option><option>500.0</option>
+        </select>
+      </label><br>
+      <label><input type="checkbox" id="auto-spin"> Giros automáticos</label><br>
+      <button id="girar-btn" class="girar-btn" onclick="girar()">🔄</button>
+      <div id="free-spins"></div>
+      <div id="mensagem"></div>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
