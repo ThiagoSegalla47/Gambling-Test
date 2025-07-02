@@ -24,7 +24,7 @@ function atualizarTela() {
 }
 
 function gerarSimboloAleatorio() {
-  if (segallaAtivo) {
+  if (segallaAtivo && simboloSegalla) {
     const rand = Math.random();
     if (rand < 0.6) return simboloSegalla;
     if (rand < 0.9) return simbolos.find(s => s.tipo === "wild");
@@ -51,7 +51,11 @@ function girar() {
   simboloSegalla = null;
   if (segallaAtivo) {
     const naoWild = simbolos.filter(s => s.tipo !== "wild");
-    simboloSegalla = naoWild[Math.floor(Math.random() * naoWild.length)];
+    if (naoWild.length === 0) {
+      segallaAtivo = false;
+    } else {
+      simboloSegalla = naoWild[Math.floor(Math.random() * naoWild.length)];
+    }
   }
 
   const grid = [];
@@ -72,27 +76,30 @@ function girar() {
     setTimeout(() => cell.classList.remove("girar"), 500);
   });
 
-  if (segallaAtivo) {
-    const novos = grid.flat().some(s => s.emoji === simboloSegalla.emoji || s.tipo === "wild");
-    if (novos) {
-      setTimeout(() => repetirSegalla(grid, aposta), 800);
-      return;
-    }
+  if (segallaAtivo && simboloSegalla) {
+    setTimeout(() => repetirSegalla(grid, aposta), 800);
+    return;
   }
 
-  finalizarGiro(grid, aposta);
+  finalizarGiro(grid, aposta, false);
 }
 
 function repetirSegalla(anteriores, aposta) {
+  // Gira até preencher tudo com simboloSegalla ou wild
   const grid = [];
+  let completo = true;
   for (let i = 0; i < 3; i++) {
     const linha = [];
     for (let j = 0; j < 3; j++) {
       const atual = anteriores[i][j];
-      if (atual.emoji === simboloSegalla.emoji || atual.tipo === "wild") {
+      if (simboloSegalla && (atual.emoji === simboloSegalla.emoji || atual.tipo === "wild")) {
         linha.push(atual);
       } else {
-        linha.push(gerarSimboloAleatorio());
+        const novo = gerarSimboloAleatorio();
+        linha.push(novo);
+        if (!(novo.emoji === simboloSegalla.emoji || novo.tipo === "wild")) {
+          completo = false;
+        }
       }
     }
     grid.push(linha);
@@ -107,15 +114,14 @@ function repetirSegalla(anteriores, aposta) {
     setTimeout(() => cell.classList.remove("girar"), 500);
   });
 
-  const novos = grid.flat().some(s => s.emoji === simboloSegalla.emoji || s.tipo === "wild");
-  if (novos) {
+  if (!completo) {
     setTimeout(() => repetirSegalla(grid, aposta), 800);
   } else {
-    finalizarGiro(grid, aposta);
+    finalizarGiro(grid, aposta, true);
   }
 }
 
-function finalizarGiro(grid, aposta) {
+function finalizarGiro(grid, aposta, segallaPremioTotal) {
   const ganhadores = verificarCombinacoes(grid);
   let ganho = 0;
   ganhadores.forEach((s) => {
@@ -124,8 +130,14 @@ function finalizarGiro(grid, aposta) {
 
   const msg = document.getElementById("mensagem");
   if (ganho > 0) {
-    const premiouTudo = verificarPremioTotal(grid);
-    if (premiouTudo) ganho *= 10;
+    let multiplicador = 1;
+    if (segallaPremioTotal) {
+      multiplicador = 10;
+    } else {
+      const premiouTudo = verificarPremioTotal(grid);
+      if (premiouTudo) multiplicador = 10;
+    }
+    ganho *= multiplicador;
     saldo += ganho;
     msg.textContent = `🎉 Você ganhou R$ ${ganho.toFixed(2)}!`;
   } else {
